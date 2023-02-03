@@ -20,7 +20,29 @@
 
 [Modules/TensorMechanics/Master]
   [all]
+    strain = SMALL
     add_variables = true
+  []
+[]
+
+[BCs]
+  [bottom_x]
+    type = DirichletBC
+    variable = disp_x
+    boundary = bottom
+    value = 0
+  []
+  [bottom_y]
+    type = DirichletBC
+    variable = disp_y
+    boundary = bottom
+    value = 0
+  []
+  [Pressure]
+    [top]
+      boundary = top
+      function = 1e7*t
+    []
   []
 []
 
