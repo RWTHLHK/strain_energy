@@ -18,11 +18,22 @@
   []
 []
 
-[Modules/TensorMechanics/Master]
-  [all]
-    strain = SMALL
-    add_variables = true
+[Variables]
+  [disp_x]
+    order = FIRST
+    family = LAGRANGE
   []
+  [disp_y]
+    order = FIRST
+    family = LAGRANGE
+  []
+[]
+
+[Kernels]
+  [TensorMechanics]
+    #Stress divergence kernels
+    displacements = 'disp_x disp_y'
+   []
 []
 
 [BCs]
@@ -51,6 +62,10 @@
     type = ComputeIsotropicElasticityTensor
     youngs_modulus = 1e9
     poissons_ratio = 0.3
+  []
+  [strain]
+    type = ComputeSmallStrain
+    displacements = 'disp_x disp_y'
   []
   [stress]
     type = ComputeLinearElasticStress
