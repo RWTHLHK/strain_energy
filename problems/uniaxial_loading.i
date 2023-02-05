@@ -29,11 +29,29 @@
   []
 []
 
+[AuxVariables]
+    [tensile_strain_energy]
+        family = LAGRANGE
+        order = FIRST
+    []
+[]
+
 [Kernels]
   [TensorMechanics]
     #Stress divergence kernels
     displacements = 'disp_x disp_y'
    []
+[]
+
+[AuxKernels]
+    [TensileStrainEnergy]
+        type = TensileStrainEnergyAux
+        rank_two_tensor = mechanical_strain
+        variable = tensile_strain_energy
+        lambda = 120
+        mu = 80
+        block = 0
+    []
 []
 
 [BCs]
@@ -62,14 +80,17 @@
     type = ComputeIsotropicElasticityTensor
     youngs_modulus = 1e9
     poissons_ratio = 0.3
+    block = 0
   []
-  [strain]
+  [./strain]
     type = ComputeSmallStrain
     displacements = 'disp_x disp_y'
-  []
-  [stress]
+    block = 0
+  [../]
+  [./stress]
     type = ComputeLinearElasticStress
-  []
+    block = 0
+  [../]
 []
 
 [Executioner]
