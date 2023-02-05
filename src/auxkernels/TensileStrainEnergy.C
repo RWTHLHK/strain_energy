@@ -10,11 +10,13 @@ TensileStrainEnergyAux::validParams()
   InputParameters params = RankTwoScalarAux::validParams();
   params.addClassDescription("compute tensile strain energy");
   params.addRequiredParam<Real>("lambda", "lame constants");
+  params.addRequiredParam<Real>("mu", "lame constants");
   return params;
 }
 
 TensileStrainEnergyAux::TensileStrainEnergyAux(const InputParameters & parameters)
-  : RankTwoScalarAux(parameters), _lambda(getParam<Real>("lambda"))
+  : RankTwoScalarAux(parameters), _lambda(getParam<Real>("lambda")),
+  _mu(getParam<Real>("mu"))
 
 {
   RankTwoTensor _strain_tensor = MetaPhysicL::raw_value(_tensor[_qp]);
@@ -27,23 +29,19 @@ TensileStrainEnergyAux::computeValue()
   RankTwoTensor eigvectors;
   _strain_tensor.symmetricEigenvaluesEigenvectors(eigvals, eigvectors);
   RankTwoTensor positive_part;
+
   for (auto i : make_range(3))
   {
-    for (auto j : make_range(3))
+    if (eigvals[i] > 0)
     {
-      positive_part(i, j) = 0;
+      positive_part += eigvals[i]*Kronecker(eigvectors.column(i));
     }
   }
-  for (auto i : make_range(3))
-  {
-    if (eigvals(i) > 0)
-    {
-      positive_part += 0;
-    }
-  }
+  
   Real strain_trace = _strain_tensor.tr(); // trace of total strain tensor
   if (strain_trace > 0)
-    return 0.5 * _lambda * strain_trace * strain_trace;
+    return 0.5 * _lambda * strain_trace * strain_trace + 
+           _mu * (positive_part * positive_part).tr();
   else
-    return 0;
+    return _mu * (positive_part * positive_part).tr();
 }
