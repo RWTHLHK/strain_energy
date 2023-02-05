@@ -34,7 +34,12 @@
         family = LAGRANGE
         order = FIRST
     []
+    [max_strain_energy]
+        family = LAGRANGE
+        order = FIRST
+    []
 []
+
 
 [Kernels]
   [TensorMechanics]
